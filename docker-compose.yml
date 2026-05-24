@@ -1,0 +1,54 @@
+services:
+
+  # ── SQL Server 2022 (Linux container) ──────────────────────────────────────
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: prn232-sqlserver
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "YourStrong@Passw0rd"
+      MSSQL_PID: "Express"
+    ports:
+      - "1433:1433"        # expose to host so you can connect via SSMS / Azure Data Studio
+    volumes:
+      - sqlserver_data:/var/opt/mssql   # persist data between restarts
+    healthcheck:
+      # sqlcmd path in mssql/server:2022 image; -C trusts self-signed cert
+      test:
+        [
+          "CMD-SHELL",
+          "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'YourStrong@Passw0rd' -Q 'SELECT 1' -C -l 5 || exit 1"
+        ]
+      interval: 15s
+      timeout: 10s
+      retries: 12
+      start_period: 60s    # SQL Server is slow to initialise on first run
+
+  # ── PRN232 LMS REST API ─────────────────────────────────────────────────────
+  api:
+    build:
+      context: .            # solution root (where Dockerfile lives)
+      dockerfile: Dockerfile
+    container_name: prn232-lms-api
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      # Override the LocalDB connection string from appsettings.json
+      # "sqlserver" resolves to the container name on the Docker network
+      ConnectionStrings__DefaultConnection: >-
+        Server=sqlserver,1433;
+        Database=PRN232_LMS;
+        User Id=sa;
+        Password=YourStrong@Passw0rd;
+        TrustServerCertificate=True;
+        MultipleActiveResultSets=true;
+        Connection Timeout=60
+    ports:
+      - "5024:8080"         # http://localhost:5024  →  container :8080
+    depends_on:
+      sqlserver:
+        condition: service_healthy   # wait until SQL Server passes healthcheck
+    restart: on-failure
+
+# ── Named volumes ─────────────────────────────────────────────────────────────
+volumes:
+  sqlserver_data:

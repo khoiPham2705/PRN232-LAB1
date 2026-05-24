@@ -1,0 +1,13 @@
+# Files/folders to exclude from the Docker build context.
+# Keeps image builds fast by not sending unnecessary files to the daemon.
+
+**/.vs
+**/.git
+**/.gitignore
+**/bin
+**/obj
+**/*.user
+**/*.suo
+**/node_modules
+**/Thumbs.db
+**/*.md
