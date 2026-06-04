@@ -1,47 +1,71 @@
-namespace PRN232.LMS.Models.BusinessModels;
+﻿using System.ComponentModel.DataAnnotations;
 
-public class SemesterBM
+namespace PRN232.LMS.Services.RequestModels;
+
+public class SemesterRequest
 {
-    public int SemesterId { get; set; }
+    [Required]
+    [MaxLength(100)]
     public string SemesterName { get; set; } = null!;
+
+    [Required]
     public DateTime StartDate { get; set; }
+
+    [Required]
     public DateTime EndDate { get; set; }
-    public int CourseCount { get; set; }
 }
 
-public class CourseBM
+public class CourseRequest
 {
-    public int CourseId { get; set; }
+    [Required]
+    [MaxLength(100)]
     public string CourseName { get; set; } = null!;
+
+    [Required]
     public int SemesterId { get; set; }
-    public string? SemesterName { get; set; }
-    public int EnrollmentCount { get; set; }
 }
 
-public class SubjectBM
+public class SubjectRequest
 {
-    public int SubjectId { get; set; }
+    [Required]
+    [MaxLength(20)]
     public string SubjectCode { get; set; } = null!;
+
+    [Required]
+    [MaxLength(100)]
     public string SubjectName { get; set; } = null!;
+
+    [Range(1, 10)]
     public int Credit { get; set; }
 }
 
-public class StudentBM
+public class StudentRequest
 {
-    public int StudentId { get; set; }
+    [Required]
+    [MaxLength(100)]
     public string FullName { get; set; } = null!;
+
+    [Required]
+    [EmailAddress]
+    [MaxLength(100)]
     public string Email { get; set; } = null!;
+
+    [Required]
     public DateTime DateOfBirth { get; set; }
-    public int EnrollmentCount { get; set; }
 }
 
-public class EnrollmentBM
+public class EnrollmentRequest
 {
-    public int EnrollmentId { get; set; }
+    [Required]
     public int StudentId { get; set; }
-    public string? StudentFullName { get; set; }
+
+    [Required]
     public int CourseId { get; set; }
-    public string? CourseName { get; set; }
+
+    [Required]
     public DateTime EnrollDate { get; set; }
+
+    [Required]
+    [MaxLength(20)]
     public string Status { get; set; } = null!;
 }

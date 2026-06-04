@@ -1,5 +1,5 @@
-using Microsoft.EntityFrameworkCore;
-using PRN232.LMS.Models.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using PRN232.LMS.Repositories.Entities;
 using PRN232.LMS.Repositories.Data;
 using PRN232.LMS.Repositories.Interfaces;
 

@@ -1,6 +1,6 @@
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
-namespace PRN232.LMS.Models.ResponseModels;
+namespace PRN232.LMS.Services.ResponseModels;
 
 public class PaginationMetadata
 {

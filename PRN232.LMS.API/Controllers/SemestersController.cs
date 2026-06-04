@@ -1,6 +1,6 @@
-using Microsoft.AspNetCore.Mvc;
-using PRN232.LMS.Models.RequestModels;
-using PRN232.LMS.Models.ResponseModels;
+﻿using Microsoft.AspNetCore.Mvc;
+using PRN232.LMS.Services.RequestModels;
+using PRN232.LMS.Services.ResponseModels;
 using PRN232.LMS.Services.Interfaces;
 
 namespace PRN232.LMS.API.Controllers;

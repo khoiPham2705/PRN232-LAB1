@@ -1,5 +1,5 @@
-using PRN232.LMS.Models.RequestModels;
-using PRN232.LMS.Models.ResponseModels;
+﻿using PRN232.LMS.Services.RequestModels;
+using PRN232.LMS.Services.ResponseModels;
 
 namespace PRN232.LMS.Services.Interfaces;
 

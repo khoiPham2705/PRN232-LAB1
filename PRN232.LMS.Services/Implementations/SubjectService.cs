@@ -1,7 +1,7 @@
-using PRN232.LMS.Models.BusinessModels;
-using PRN232.LMS.Models.Entities;
-using PRN232.LMS.Models.RequestModels;
-using PRN232.LMS.Models.ResponseModels;
+﻿using PRN232.LMS.Services.BusinessModels;
+using PRN232.LMS.Repositories.Entities;
+using PRN232.LMS.Services.RequestModels;
+using PRN232.LMS.Services.ResponseModels;
 using PRN232.LMS.Repositories.Interfaces;
 using PRN232.LMS.Services.Helpers;
 using PRN232.LMS.Services.Interfaces;

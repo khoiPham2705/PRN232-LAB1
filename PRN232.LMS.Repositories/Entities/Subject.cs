@@ -1,7 +1,7 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace PRN232.LMS.Models.Entities;
+namespace PRN232.LMS.Repositories.Entities;
 
 [Table("Subject")]
 public class Subject

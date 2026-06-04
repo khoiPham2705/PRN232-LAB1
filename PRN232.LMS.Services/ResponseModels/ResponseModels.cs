@@ -1,12 +1,13 @@
 using System.Text.Json.Serialization;
 
-namespace PRN232.LMS.Models.ResponseModels;
+namespace PRN232.LMS.Services.ResponseModels;
 
 /// <summary>Generic API response wrapper – never exposes Entity Models directly.</summary>
 public class ApiResponse<T>
 {
     public bool Success { get; set; }
     public string Message { get; set; } = string.Empty;
+    [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
     public T? Data { get; set; }
     /// <summary>Null on success; populated with validation/business rule messages on failure.</summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.Never)] // Always emit — even as null — per response contract

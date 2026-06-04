@@ -1,7 +1,7 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PRN232.LMS.API.Middleware;
-using PRN232.LMS.Models.ResponseModels;
+using PRN232.LMS.Services.ResponseModels;
 using PRN232.LMS.Repositories.Data;
 using PRN232.LMS.Repositories.Implementations;
 using PRN232.LMS.Repositories.Interfaces;

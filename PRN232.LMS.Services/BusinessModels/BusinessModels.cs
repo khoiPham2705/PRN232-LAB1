@@ -1,71 +1,47 @@
-using System.ComponentModel.DataAnnotations;
+﻿namespace PRN232.LMS.Services.BusinessModels;
 
-namespace PRN232.LMS.Models.RequestModels;
-
-public class SemesterRequest
+public class SemesterBM
 {
-    [Required]
-    [MaxLength(100)]
-    public string SemesterName { get; set; } = null!;
-
-    [Required]
-    public DateTime StartDate { get; set; }
-
-    [Required]
-    public DateTime EndDate { get; set; }
-}
-
-public class CourseRequest
-{
-    [Required]
-    [MaxLength(100)]
-    public string CourseName { get; set; } = null!;
-
-    [Required]
     public int SemesterId { get; set; }
+    public string SemesterName { get; set; } = null!;
+    public DateTime StartDate { get; set; }
+    public DateTime EndDate { get; set; }
+    public int CourseCount { get; set; }
 }
 
-public class SubjectRequest
+public class CourseBM
 {
-    [Required]
-    [MaxLength(20)]
+    public int CourseId { get; set; }
+    public string CourseName { get; set; } = null!;
+    public int SemesterId { get; set; }
+    public string? SemesterName { get; set; }
+    public int EnrollmentCount { get; set; }
+}
+
+public class SubjectBM
+{
+    public int SubjectId { get; set; }
     public string SubjectCode { get; set; } = null!;
-
-    [Required]
-    [MaxLength(100)]
     public string SubjectName { get; set; } = null!;
-
-    [Range(1, 10)]
     public int Credit { get; set; }
 }
 
-public class StudentRequest
+public class StudentBM
 {
-    [Required]
-    [MaxLength(100)]
+    public int StudentId { get; set; }
     public string FullName { get; set; } = null!;
-
-    [Required]
-    [EmailAddress]
-    [MaxLength(100)]
     public string Email { get; set; } = null!;
-
-    [Required]
     public DateTime DateOfBirth { get; set; }
+    public int EnrollmentCount { get; set; }
 }
 
-public class EnrollmentRequest
+public class EnrollmentBM
 {
-    [Required]
+    public int EnrollmentId { get; set; }
     public int StudentId { get; set; }
-
-    [Required]
+    public string? StudentFullName { get; set; }
     public int CourseId { get; set; }
-
-    [Required]
+    public string? CourseName { get; set; }
     public DateTime EnrollDate { get; set; }
-
-    [Required]
-    [MaxLength(20)]
     public string Status { get; set; } = null!;
 }

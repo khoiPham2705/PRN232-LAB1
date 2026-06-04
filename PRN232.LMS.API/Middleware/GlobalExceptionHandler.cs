@@ -1,5 +1,5 @@
-using Microsoft.AspNetCore.Diagnostics;
-using PRN232.LMS.Models.ResponseModels;
+﻿using Microsoft.AspNetCore.Diagnostics;
+using PRN232.LMS.Services.ResponseModels;
 using System.Net;
 using System.Text.Json;
 

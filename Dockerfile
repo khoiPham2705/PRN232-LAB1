@@ -3,7 +3,7 @@ FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 
 # Copy project files first for optimal layer caching on restore
-COPY PRN232.LMS.Models/PRN232.LMS.Models.csproj             PRN232.LMS.Models/
+
 COPY PRN232.LMS.Repositories/PRN232.LMS.Repositories.csproj PRN232.LMS.Repositories/
 COPY PRN232.LMS.Services/PRN232.LMS.Services.csproj          PRN232.LMS.Services/
 COPY PRN232.LMS.API/PRN232.LMS.API.csproj                    PRN232.LMS.API/

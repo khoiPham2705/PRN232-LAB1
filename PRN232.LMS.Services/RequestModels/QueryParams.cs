@@ -1,6 +1,6 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace PRN232.LMS.Models.RequestModels;
+namespace PRN232.LMS.Services.RequestModels;
 
 /// <summary>Universal query parameters for all list endpoints.</summary>
 public class QueryParams

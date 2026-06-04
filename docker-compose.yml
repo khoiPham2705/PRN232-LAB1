@@ -9,7 +9,7 @@ services:
       MSSQL_SA_PASSWORD: "YourStrong@Passw0rd"
       MSSQL_PID: "Express"
     ports:
-      - "1433:1433"        # expose to host so you can connect via SSMS / Azure Data Studio
+      - "1434:1433"        # expose to host so you can connect via SSMS / Azure Data Studio
     volumes:
       - sqlserver_data:/var/opt/mssql   # persist data between restarts
     healthcheck:
