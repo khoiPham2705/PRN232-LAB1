@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using PRN232.LMS.Services.RequestModels;
 using PRN232.LMS.Services.ResponseModels;
 using PRN232.LMS.Services.Interfaces;
+using Asp.Versioning;
+using Microsoft.AspNetCore.Authorization;
 
 namespace PRN232.LMS.API.Controllers;
 
@@ -9,8 +11,9 @@ namespace PRN232.LMS.API.Controllers;
 /// Manages academic subjects (independent of courses/semesters).
 /// </summary>
 [ApiController]
-[Route("api/[controller]")]
-[Produces("application/json")]
+[ApiVersion("1.0")]
+[Route("api/v{version:apiVersion}/[controller]")]
+[Authorize]
 public class SubjectsController : ControllerBase
 {
     private readonly ISubjectService _service;
@@ -23,16 +26,26 @@ public class SubjectsController : ControllerBase
     /// <c>?fields=subjectId,subjectCode,subjectName</c>
     /// </remarks>
     [HttpGet]
+    [AllowAnonymous]
     [ProducesResponseType(typeof(PagedApiResponse), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetAll([FromQuery] QueryParams q)
-        => Ok(await _service.GetAllAsync(q));
+    public async Task<IActionResult> GetAll(
+        [FromQuery] QueryParams q,
+        [FromHeader(Name = "X-Request-Id")] string? requestId)
+    {
+        if (requestId != null)
+        {
+            HttpContext.Response.Headers["X-Response-Id"] = requestId;
+        }
+        return Ok(await _service.GetAllAsync(q));
+    }
 
     /// <summary>Get a subject by ID.</summary>
     /// <param name="id">Subject ID</param>
-    [HttpGet("{id:int}")]
+    [HttpGet("{id:int}", Name = "GetSubjectById")]
+    [AllowAnonymous]
     [ProducesResponseType(typeof(ApiResponse<SubjectResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<SubjectResponse>), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetById(int id)
+    public async Task<IActionResult> GetById([FromRoute] int id)
     {
         var result = await _service.GetByIdAsync(id);
         return result.Success ? Ok(result) : NotFound(result);
@@ -45,7 +58,7 @@ public class SubjectsController : ControllerBase
     public async Task<IActionResult> Create([FromBody] SubjectRequest request)
     {
         var result = await _service.CreateAsync(request);
-        return CreatedAtAction(nameof(GetById), new { id = result.Data!.SubjectId }, result);
+        return CreatedAtRoute("GetSubjectById", new { version = "1", id = result.Data!.SubjectId }, result);
     }
 
     /// <summary>Update an existing subject.</summary>
@@ -54,7 +67,7 @@ public class SubjectsController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse<SubjectResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<object>),          StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiResponse<SubjectResponse>), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Update(int id, [FromBody] SubjectRequest request)
+    public async Task<IActionResult> Update([FromRoute] int id, [FromBody] SubjectRequest request)
     {
         var result = await _service.UpdateAsync(id, request);
         return result.Success ? Ok(result) : NotFound(result);
@@ -63,9 +76,10 @@ public class SubjectsController : ControllerBase
     /// <summary>Delete a subject by ID.</summary>
     /// <param name="id">Subject ID to delete</param>
     [HttpDelete("{id:int}")]
+    [Authorize(Roles = "Admin")]
     [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Delete(int id)
+    public async Task<IActionResult> Delete([FromRoute] int id)
     {
         var result = await _service.DeleteAsync(id);
         return result.Success ? Ok(result) : NotFound(result);

@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using PRN232.LMS.Services.RequestModels;
 using PRN232.LMS.Services.ResponseModels;
 using PRN232.LMS.Services.Interfaces;
+using Asp.Versioning;
+using Microsoft.AspNetCore.Authorization;
 
 namespace PRN232.LMS.API.Controllers;
 
@@ -9,8 +11,9 @@ namespace PRN232.LMS.API.Controllers;
 /// Manages student enrollments in courses.
 /// </summary>
 [ApiController]
-[Route("api/[controller]")]
-[Produces("application/json")]
+[ApiVersion("1.0")]
+[Route("api/v{version:apiVersion}/[controller]")]
+[Authorize]
 public class EnrollmentsController : ControllerBase
 {
     private readonly IEnrollmentService _service;
@@ -25,25 +28,31 @@ public class EnrollmentsController : ControllerBase
     /// - **Fields**: <c>?fields=enrollmentId,status</c>
     /// - **Expand**: <c>?expand=student,course</c> — includes nested student and course objects
     /// - **Filter**: <c>?studentId=5</c> or <c>?courseId=3</c>
-    ///
-    /// Combined example:
-    /// <c>?search=active&amp;sort=-enrollDate&amp;page=1&amp;size=20&amp;fields=enrollmentId,status&amp;expand=student,course</c>
     /// </remarks>
     [HttpGet]
+    [AllowAnonymous]
     [ProducesResponseType(typeof(PagedApiResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAll(
         [FromQuery] QueryParams q,
         [FromQuery] int? studentId = null,
-        [FromQuery] int? courseId  = null)
-        => Ok(await _service.GetAllAsync(q, studentId, courseId));
+        [FromQuery] int? courseId  = null,
+        [FromHeader(Name = "X-Request-Id")] string? requestId = null)
+    {
+        if (requestId != null)
+        {
+            HttpContext.Response.Headers["X-Response-Id"] = requestId;
+        }
+        return Ok(await _service.GetAllAsync(q, studentId, courseId));
+    }
 
     /// <summary>Get an enrollment by ID.</summary>
     /// <remarks>Returns complete enrollment detail including student name/email, course name, and semester name.</remarks>
     /// <param name="id">Enrollment ID</param>
-    [HttpGet("{id:int}")]
+    [HttpGet("{id:int}", Name = "GetEnrollmentById")]
+    [AllowAnonymous]
     [ProducesResponseType(typeof(ApiResponse<EnrollmentResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<EnrollmentResponse>), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetById(int id)
+    public async Task<IActionResult> GetById([FromRoute] int id)
     {
         var result = await _service.GetByIdAsync(id);
         return result.Success ? Ok(result) : NotFound(result);
@@ -58,7 +67,7 @@ public class EnrollmentsController : ControllerBase
     {
         var result = await _service.CreateAsync(request);
         if (!result.Success) return BadRequest(result);
-        return CreatedAtAction(nameof(GetById), new { id = result.Data!.EnrollmentId }, result);
+        return CreatedAtRoute("GetEnrollmentById", new { version = "1", id = result.Data!.EnrollmentId }, result);
     }
 
     /// <summary>Update an existing enrollment.</summary>
@@ -67,7 +76,7 @@ public class EnrollmentsController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse<EnrollmentResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<object>),             StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiResponse<EnrollmentResponse>), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Update(int id, [FromBody] EnrollmentRequest request)
+    public async Task<IActionResult> Update([FromRoute] int id, [FromBody] EnrollmentRequest request)
     {
         var result = await _service.UpdateAsync(id, request);
         return result.Success ? Ok(result) : NotFound(result);
@@ -76,9 +85,10 @@ public class EnrollmentsController : ControllerBase
     /// <summary>Delete an enrollment by ID.</summary>
     /// <param name="id">Enrollment ID to delete</param>
     [HttpDelete("{id:int}")]
+    [Authorize(Roles = "Admin")]
     [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Delete(int id)
+    public async Task<IActionResult> Delete([FromRoute] int id)
     {
         var result = await _service.DeleteAsync(id);
         return result.Success ? Ok(result) : NotFound(result);

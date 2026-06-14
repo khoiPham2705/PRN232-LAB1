@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using PRN232.LMS.Services.RequestModels;
 using PRN232.LMS.Services.ResponseModels;
 using PRN232.LMS.Services.Interfaces;
+using Asp.Versioning;
+using Microsoft.AspNetCore.Authorization;
 
 namespace PRN232.LMS.API.Controllers;
 
@@ -9,34 +11,49 @@ namespace PRN232.LMS.API.Controllers;
 /// Manages students enrolled in the LMS.
 /// </summary>
 [ApiController]
-[Route("api/[controller]")]
-[Produces("application/json")]
+[ApiVersion("1.0")]
+[ApiVersion("2.0")]
+[Route("api/v{version:apiVersion}/[controller]")]
+[Authorize]
 public class StudentsController : ControllerBase
 {
     private readonly IStudentService _service;
     public StudentsController(IStudentService service) => _service = service;
 
-    /// <summary>Get all students.</summary>
-    /// <remarks>
-    /// Supports full query capabilities:
-    /// - **Search**: <c>?search=nguyen</c> — filters fullName and email
-    /// - **Sort**: <c>?sort=fullName,-dateOfBirth</c> — multi-field, prefix <c>-</c> for descending
-    /// - **Paging**: <c>?page=2&amp;size=10</c>
-    /// - **Fields**: <c>?fields=studentId,fullName,email</c> — returns only selected fields
-    /// - **Expand**: <c>?expand=enrollments</c> — includes each student's enrollment list
-    /// </remarks>
+    /// <summary>Get all students (V1).</summary>
     [HttpGet]
+    [MapToApiVersion("1.0")]
+    [AllowAnonymous]
     [ProducesResponseType(typeof(PagedApiResponse), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetAll([FromQuery] QueryParams q)
-        => Ok(await _service.GetAllAsync(q));
+    public async Task<IActionResult> GetAll(
+        [FromQuery] QueryParams q,
+        [FromHeader(Name = "X-Request-Id")] string? requestId)
+    {
+        if (requestId != null)
+        {
+            HttpContext.Response.Headers["X-Response-Id"] = requestId;
+        }
+        return Ok(await _service.GetAllAsync(q));
+    }
+
+    /// <summary>Get all students (V2 - Beta info).</summary>
+    [HttpGet]
+    [MapToApiVersion("2.0")]
+    [AllowAnonymous]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status200OK)]
+    public IActionResult GetAllV2()
+    {
+        return Ok(ApiResponse<object>.Ok(new { Info = "LMS Students API Version 2.0 (Beta)", SupportedFormat = "JSON/XML" }, "Welcome to API Version 2.0"));
+    }
 
     /// <summary>Get a student by ID.</summary>
     /// <remarks>Returns full student detail including all enrollments (with course and semester names).</remarks>
     /// <param name="id">Student ID</param>
-    [HttpGet("{id:int}")]
+    [HttpGet("{id:int}", Name = "GetStudentById")]
+    [AllowAnonymous]
     [ProducesResponseType(typeof(ApiResponse<StudentResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<StudentResponse>), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetById(int id)
+    public async Task<IActionResult> GetById([FromRoute] int id)
     {
         var result = await _service.GetByIdAsync(id);
         return result.Success ? Ok(result) : NotFound(result);
@@ -49,7 +66,7 @@ public class StudentsController : ControllerBase
     public async Task<IActionResult> Create([FromBody] StudentRequest request)
     {
         var result = await _service.CreateAsync(request);
-        return CreatedAtAction(nameof(GetById), new { id = result.Data!.StudentId }, result);
+        return CreatedAtRoute("GetStudentById", new { version = "1", id = result.Data!.StudentId }, result);
     }
 
     /// <summary>Update an existing student.</summary>
@@ -58,7 +75,7 @@ public class StudentsController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse<StudentResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<object>),          StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiResponse<StudentResponse>), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Update(int id, [FromBody] StudentRequest request)
+    public async Task<IActionResult> Update([FromRoute] int id, [FromBody] StudentRequest request)
     {
         var result = await _service.UpdateAsync(id, request);
         return result.Success ? Ok(result) : NotFound(result);
@@ -67,9 +84,10 @@ public class StudentsController : ControllerBase
     /// <summary>Delete a student by ID.</summary>
     /// <param name="id">Student ID to delete</param>
     [HttpDelete("{id:int}")]
+    [Authorize(Roles = "Admin")]
     [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Delete(int id)
+    public async Task<IActionResult> Delete([FromRoute] int id)
     {
         var result = await _service.DeleteAsync(id);
         return result.Success ? Ok(result) : NotFound(result);

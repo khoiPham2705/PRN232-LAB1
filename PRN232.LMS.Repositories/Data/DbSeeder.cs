@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using PRN232.LMS.Repositories.Entities;
 
 namespace PRN232.LMS.Repositories.Data;
@@ -10,6 +10,25 @@ public static class DbSeeder
     {
         // Apply any pending migrations first
         await context.Database.MigrateAsync();
+
+        // Seed users if empty
+        if (!await context.Users.AnyAsync())
+        {
+            var adminUser = new User
+            {
+                Username = "admin",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("password123"),
+                Role = "Admin"
+            };
+            var studentUser = new User
+            {
+                Username = "se231231",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("password123"),
+                Role = "Student"
+            };
+            context.Users.AddRange(adminUser, studentUser);
+            await context.SaveChangesAsync();
+        }
 
         if (await context.Semesters.AnyAsync()) return; // already seeded
 
