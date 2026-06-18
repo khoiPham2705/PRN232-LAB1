@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace PRN232.LMS.Services.RequestModels;
 
@@ -42,16 +42,20 @@ public class SubjectRequest
 public class StudentRequest
 {
     [Required]
-    [MaxLength(100)]
+    [StringLength(100)]
     public string FullName { get; set; } = null!;
 
     [Required]
     [EmailAddress]
-    [MaxLength(100)]
+    [StringLength(100)]
     public string Email { get; set; } = null!;
 
     [Required]
     public DateTime DateOfBirth { get; set; }
+
+    [Phone]
+    [RegularExpression(@"^0\d{9}$", ErrorMessage = "Phone number must start with 0 and contain exactly 10 digits.")]
+    public string? Phone { get; set; }
 }
 
 public class EnrollmentRequest
