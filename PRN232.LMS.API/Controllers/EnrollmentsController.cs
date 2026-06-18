@@ -14,6 +14,7 @@ namespace PRN232.LMS.API.Controllers;
 [ApiVersion("1.0")]
 [Route("api/v{version:apiVersion}/[controller]")]
 [Authorize]
+[Produces("application/json", "application/xml")]
 public class EnrollmentsController : ControllerBase
 {
     private readonly IEnrollmentService _service;
@@ -30,7 +31,6 @@ public class EnrollmentsController : ControllerBase
     /// - **Filter**: <c>?studentId=5</c> or <c>?courseId=3</c>
     /// </remarks>
     [HttpGet]
-    [AllowAnonymous]
     [ProducesResponseType(typeof(PagedApiResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAll(
         [FromQuery] QueryParams q,
@@ -49,7 +49,6 @@ public class EnrollmentsController : ControllerBase
     /// <remarks>Returns complete enrollment detail including student name/email, course name, and semester name.</remarks>
     /// <param name="id">Enrollment ID</param>
     [HttpGet("{id:int}", Name = "GetEnrollmentById")]
-    [AllowAnonymous]
     [ProducesResponseType(typeof(ApiResponse<EnrollmentResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<EnrollmentResponse>), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetById([FromRoute] int id)

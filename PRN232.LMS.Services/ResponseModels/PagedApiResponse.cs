@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
+using System.Runtime.Serialization;
 
 namespace PRN232.LMS.Services.ResponseModels;
 
@@ -19,6 +20,13 @@ public class PaginationMetadata
 }
 
 /// <summary>Paged response used by all list endpoints. Data may be full DTOs or field-selected ExpandoObjects.</summary>
+[KnownType(typeof(List<StudentResponse>))]
+[KnownType(typeof(List<CourseResponse>))]
+[KnownType(typeof(List<SemesterResponse>))]
+[KnownType(typeof(List<SubjectResponse>))]
+[KnownType(typeof(List<EnrollmentResponse>))]
+[KnownType(typeof(List<object>))]
+[KnownType(typeof(System.Dynamic.ExpandoObject))]
 public class PagedApiResponse
 {
     public bool Success { get; set; }

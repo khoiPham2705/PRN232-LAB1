@@ -11,22 +11,35 @@ public static class DbSeeder
         // Apply any pending migrations first
         await context.Database.MigrateAsync();
 
-        // Seed users if empty
-        if (!await context.Users.AnyAsync())
+        // Ensure admin user exists with password "123456"
+        var admin = await context.Users.FirstOrDefaultAsync(u => u.Username == "admin");
+        if (admin != null)
+        {
+            admin.PasswordHash = BCrypt.Net.BCrypt.HashPassword("123456");
+            await context.SaveChangesAsync();
+        }
+        else
         {
             var adminUser = new User
             {
                 Username = "admin",
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword("password123"),
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("123456"),
                 Role = "Admin"
             };
+            context.Users.Add(adminUser);
+            await context.SaveChangesAsync();
+        }
+
+        // Ensure default student user exists
+        if (!await context.Users.AnyAsync(u => u.Username == "se231231"))
+        {
             var studentUser = new User
             {
                 Username = "se231231",
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword("password123"),
                 Role = "Student"
             };
-            context.Users.AddRange(adminUser, studentUser);
+            context.Users.Add(studentUser);
             await context.SaveChangesAsync();
         }
 

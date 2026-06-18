@@ -14,6 +14,7 @@ namespace PRN232.LMS.API.Controllers;
 [ApiVersion("1.0")]
 [Route("api/v{version:apiVersion}/[controller]")]
 [Authorize]
+[Produces("application/json", "application/xml")]
 public class CoursesController : ControllerBase
 {
     private readonly ICourseService _service;
@@ -26,7 +27,6 @@ public class CoursesController : ControllerBase
     /// <c>?expand=semester</c> <c>?semesterId=1</c> (filter by semester)
     /// </remarks>
     [HttpGet]
-    [AllowAnonymous]
     [ProducesResponseType(typeof(PagedApiResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAll(
         [FromQuery] QueryParams q, 
@@ -43,7 +43,6 @@ public class CoursesController : ControllerBase
     /// <summary>Get a course by ID including enrolled students.</summary>
     /// <param name="id">Course ID</param>
     [HttpGet("{id:int}", Name = "GetCourseById")]
-    [AllowAnonymous]
     [ProducesResponseType(typeof(ApiResponse<CourseResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<CourseResponse>), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetById([FromRoute] int id)
@@ -55,7 +54,6 @@ public class CoursesController : ControllerBase
     /// <summary>Get students enrolled in a specific course (nested resource).</summary>
     /// <param name="courseId">Course ID</param>
     [HttpGet("{courseId:int}/students")]
-    [AllowAnonymous]
     [ProducesResponseType(typeof(ApiResponse<List<StudentEnrollmentSummaryResponse>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetStudentsByCourse([FromRoute] int courseId)

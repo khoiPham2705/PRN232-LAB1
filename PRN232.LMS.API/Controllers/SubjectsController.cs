@@ -14,6 +14,7 @@ namespace PRN232.LMS.API.Controllers;
 [ApiVersion("1.0")]
 [Route("api/v{version:apiVersion}/[controller]")]
 [Authorize]
+[Produces("application/json", "application/xml")]
 public class SubjectsController : ControllerBase
 {
     private readonly ISubjectService _service;
@@ -26,7 +27,6 @@ public class SubjectsController : ControllerBase
     /// <c>?fields=subjectId,subjectCode,subjectName</c>
     /// </remarks>
     [HttpGet]
-    [AllowAnonymous]
     [ProducesResponseType(typeof(PagedApiResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAll(
         [FromQuery] QueryParams q,
@@ -42,7 +42,6 @@ public class SubjectsController : ControllerBase
     /// <summary>Get a subject by ID.</summary>
     /// <param name="id">Subject ID</param>
     [HttpGet("{id:int}", Name = "GetSubjectById")]
-    [AllowAnonymous]
     [ProducesResponseType(typeof(ApiResponse<SubjectResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<SubjectResponse>), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetById([FromRoute] int id)

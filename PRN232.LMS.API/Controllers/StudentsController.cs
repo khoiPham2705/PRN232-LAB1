@@ -15,6 +15,7 @@ namespace PRN232.LMS.API.Controllers;
 [ApiVersion("2.0")]
 [Route("api/v{version:apiVersion}/[controller]")]
 [Authorize]
+[Produces("application/json", "application/xml")]
 public class StudentsController : ControllerBase
 {
     private readonly IStudentService _service;
@@ -23,7 +24,6 @@ public class StudentsController : ControllerBase
     /// <summary>Get all students (V1).</summary>
     [HttpGet]
     [MapToApiVersion("1.0")]
-    [AllowAnonymous]
     [ProducesResponseType(typeof(PagedApiResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAll(
         [FromQuery] QueryParams q,
@@ -39,18 +39,16 @@ public class StudentsController : ControllerBase
     /// <summary>Get all students (V2 - Beta info).</summary>
     [HttpGet]
     [MapToApiVersion("2.0")]
-    [AllowAnonymous]
-    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<V2BetaResponse>), StatusCodes.Status200OK)]
     public IActionResult GetAllV2()
     {
-        return Ok(ApiResponse<object>.Ok(new { Info = "LMS Students API Version 2.0 (Beta)", SupportedFormat = "JSON/XML" }, "Welcome to API Version 2.0"));
+        return Ok(ApiResponse<V2BetaResponse>.Ok(new V2BetaResponse { Info = "LMS Students API Version 2.0 (Beta)", SupportedFormat = "JSON/XML" }, "Welcome to API Version 2.0"));
     }
 
     /// <summary>Get a student by ID.</summary>
     /// <remarks>Returns full student detail including all enrollments (with course and semester names).</remarks>
     /// <param name="id">Student ID</param>
     [HttpGet("{id:int}", Name = "GetStudentById")]
-    [AllowAnonymous]
     [ProducesResponseType(typeof(ApiResponse<StudentResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<StudentResponse>), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetById([FromRoute] int id)

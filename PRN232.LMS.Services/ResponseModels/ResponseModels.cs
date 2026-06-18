@@ -120,3 +120,9 @@ public class EnrollmentResponse
     public DateTime EnrollDate { get; set; }
     public string Status { get; set; } = null!;
 }
+
+public class V2BetaResponse
+{
+    public string Info { get; set; } = string.Empty;
+    public string SupportedFormat { get; set; } = string.Empty;
+}

@@ -10,10 +10,12 @@ public static class QueryHelper
     /// Returns the original collection when <paramref name="fields"/> is null/empty,
     /// or a collection of ExpandoObjects containing only the requested fields.
     /// </summary>
-    public static IEnumerable<object> ApplyFieldSelection<T>(IEnumerable<T> items, string? fields)
+    public static object ApplyFieldSelection<T>(IEnumerable<T> items, string? fields)
     {
+        var list = items is List<T> l ? l : items.ToList();
+
         if (string.IsNullOrWhiteSpace(fields))
-            return items.Cast<object>();
+            return list;
 
         var requested = fields
             .Split(',')
@@ -24,13 +26,13 @@ public static class QueryHelper
             .Where(p => requested.Contains(p.Name))
             .ToList();
 
-        return items.Select(item =>
+        return list.Select(item =>
         {
             IDictionary<string, object?> expando = new ExpandoObject();
             foreach (var prop in props)
                 expando[prop.Name] = prop.GetValue(item);
             return (object)(ExpandoObject)expando;
-        });
+        }).ToList();
     }
 
     /// <summary>

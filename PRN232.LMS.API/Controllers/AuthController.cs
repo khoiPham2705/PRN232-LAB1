@@ -8,8 +8,10 @@ using Microsoft.AspNetCore.Authorization;
 namespace PRN232.LMS.API.Controllers;
 
 [ApiController]
-[ApiVersion("1.0")]
+[ApiVersionNeutral]
+[Route("api/[controller]")]
 [Route("api/v{version:apiVersion}/[controller]")]
+[Produces("application/json", "application/xml")]
 public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;

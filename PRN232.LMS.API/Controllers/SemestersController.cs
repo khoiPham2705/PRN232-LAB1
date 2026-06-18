@@ -14,6 +14,7 @@ namespace PRN232.LMS.API.Controllers;
 [ApiVersion("1.0")]
 [Route("api/v{version:apiVersion}/[controller]")]
 [Authorize]
+[Produces("application/json", "application/xml")]
 public class SemestersController : ControllerBase
 {
     private readonly ISemesterService _service;
@@ -25,7 +26,6 @@ public class SemestersController : ControllerBase
     /// <c>?page=1&amp;size=10</c> <c>?fields=semesterId,semesterName</c>
     /// </remarks>
     [HttpGet]
-    [AllowAnonymous]
     [ProducesResponseType(typeof(PagedApiResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAll(
         [FromQuery] QueryParams q,
@@ -41,7 +41,6 @@ public class SemestersController : ControllerBase
     /// <summary>Get a semester by ID including its nested course list.</summary>
     /// <param name="id">Semester ID</param>
     [HttpGet("{id:int}", Name = "GetSemesterById")]
-    [AllowAnonymous]
     [ProducesResponseType(typeof(ApiResponse<SemesterResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<SemesterResponse>), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetById([FromRoute] int id)

@@ -120,11 +120,12 @@ builder.Services.AddSwaggerGen(c =>
     // Swagger Authorize button config
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
-        Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+        Description = "JWT Authorization header using the Bearer scheme. Enter only your token value.",
         Name = "Authorization",
         In = ParameterLocation.Header,
-        Type = SecuritySchemeType.ApiKey,
-        Scheme = "Bearer"
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT"
     });
 
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
@@ -146,27 +147,7 @@ builder.Services.AddSwaggerGen(c =>
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
     c.IncludeXmlComments(xmlPath, includeControllerXmlComments: true);
 
-    c.TagActionsBy(api => new[] { api.ActionDescriptor.RouteValues["controller"] ?? "Default" });
-    c.DocInclusionPredicate((docName, apiDesc) =>
-    {
-        if (!apiDesc.TryGetMethodInfo(out var methodInfo)) return false;
-        var versions = methodInfo.DeclaringType?
-            .GetCustomAttributes(true)
-            .OfType<ApiVersionAttribute>()
-            .SelectMany(a => a.Versions);
-
-        var maps = methodInfo
-            .GetCustomAttributes(true)
-            .OfType<MapToApiVersionAttribute>()
-            .SelectMany(a => a.Versions);
-
-        var version = docName.ToLower();
-        if (maps.Any())
-        {
-            return maps.Any(v => $"v{v}" == version);
-        }
-        return versions != null && versions.Any(v => $"v{v}" == version);
-    });
+    c.DocInclusionPredicate((docName, apiDesc) => apiDesc.GroupName == docName);
 });
 
 // ── CORS ────────────────────────────────────────────────────────────────────
@@ -196,6 +177,7 @@ if (app.Environment.IsDevelopment())
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "PRN232 LMS API v1");
         c.SwaggerEndpoint("/swagger/v2/swagger.json", "PRN232 LMS API v2");
         c.RoutePrefix = string.Empty;
+        c.EnablePersistAuthorization();
     });
 }
 
