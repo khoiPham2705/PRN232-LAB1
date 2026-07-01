@@ -1,7 +1,7 @@
 using FluentValidation;
 using PRN232.LMS.Services.RequestModels;
 
-namespace PRN232.LMS.Services.Validation;
+namespace PRN232.LMS.Services.Validators;
 
 public class StudentRequestValidator : AbstractValidator<StudentRequest>
 {

@@ -8,7 +8,7 @@ using PRN232.LMS.Repositories.Interfaces;
 using PRN232.LMS.Services.Implementations;
 using PRN232.LMS.Services.Interfaces;
 using FluentValidation;
-using PRN232.LMS.Services.Validation;
+using PRN232.LMS.Services.Validators;
 using Asp.Versioning;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
